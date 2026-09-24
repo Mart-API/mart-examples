@@ -5,3 +5,5 @@ __pycache__/
 *.pyc
 .DS_Store
 node_modules/
+contact-*.json
+meeting-context*.json

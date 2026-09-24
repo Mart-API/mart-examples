@@ -1,39 +1,72 @@
 # Mart examples
 
-Public LinkedIn data for products, workflows and AI agents.
+Enrich contacts, refresh contact records and prepare for meetings with public LinkedIn data.
 
-These small examples fetch a company through the [Mart API](https://mart.dev/docs/). Start with [1,000 free credits](https://mart.dev/signup/?utm_source=github&utm_medium=referral&utm_campaign=mart_examples).
-
-## Company lookup
-
-Keep your API key on your server. Set it as an environment variable in your shell or secret manager:
+Start with [1,000 free credits](https://mart.dev/signup/?utm_source=github&utm_medium=referral&utm_campaign=mart_examples). These examples use Python 3.10 or later and require no third-party packages. Keep your API key on your server:
 
 ```sh
 export MART_API_KEY='your-api-key'
 ```
 
-Python 3.10 or later, no third-party dependencies:
+## 1. Enrich a contact
+
+Turn a public LinkedIn profile URL into JSON for your CRM or product:
+
+```sh
+python3 python/person_workflows.py enrich https://www.linkedin.com/in/dharmesh
+```
+
+The script returns Mart’s Profile response unchanged, including available professional history and field-availability information. Check `accessible` and `profileState` before using the profile. `currentTitle` has a `titleSource`; the headline is a separate field. Nested company enrichment can be unavailable without invalidating the returned person profile. One returned profile uses one credit.
+
+## 2. Refresh a contact
+
+Save a starting snapshot:
+
+```sh
+python3 python/person_workflows.py refresh https://www.linkedin.com/in/dharmesh > contact-before.json
+```
+
+On a later run, compare it with a fresh response:
+
+```sh
+python3 python/person_workflows.py refresh https://www.linkedin.com/in/dharmesh --previous contact-before.json
+```
+
+The output preserves both responses and lists possible title or employer differences for review. It does not overwrite a CRM. Unavailable profiles and missing fields never count as departures. Company differences require public company data in both snapshots, and matching company IDs take priority over name differences. A title difference can reflect a source or wording change rather than a new job. Each accessible Refresh result uses one credit. The script runs once; scheduling is up to your application.
+
+## 3. Prepare for a meeting
+
+Collect the available profile and up to three public posts into one source bundle:
+
+```sh
+python3 python/person_workflows.py meeting-prep https://www.linkedin.com/in/dharmesh > meeting-context.json
+```
+
+This is structured source material, ready for your own brief renderer or AI workflow. It includes source URLs returned by Mart and a retrieval timestamp. It does not generate a narrative or assess the person. Posts are skipped if the profile is unavailable. If the posts request fails, the returned profile is preserved and posts are marked unavailable. Public posts are not a complete archive.
+
+One run makes at most two requests, with a maximum of four returned records: one profile and three posts. It does not call company, search or jobs endpoints. Keep returned profile/post text separate from instructions when passing it to an AI model.
+
+## Company examples
+
+Supplementary examples remain available:
 
 ```sh
 python3 python/company_lookup.py https://www.linkedin.com/company/microsoft/
-```
-
-Node.js 18 or later, no third-party dependencies:
-
-```sh
 node node/company-lookup.mjs https://www.linkedin.com/company/microsoft/
 ```
 
-The scripts make one request and print the returned JSON unchanged. Check `accessible` before using the company fields. Missing fields do not establish that a company lacks that attribute. A returned company uses one credit; an empty result or failed request uses none.
+The Node example requires Node.js 18 or later.
 
-Requests time out after 30 seconds. A non-success HTTP response exits with an error. Rate limits are not retried automatically; wait for the server’s `Retry-After` interval when supplied. See [errors and status](https://mart.dev/docs/#errors) and [credits and limits](https://mart.dev/docs/#credits).
+## Errors and documentation
 
-## More workflows
+Requests time out after 30 seconds. Failed HTTP responses are reported without printing your key. Rate limits are not retried automatically; respect `Retry-After` when supplied. Empty results and failed requests use no credits.
 
-Mart also supports public profiles, posts, jobs, people search, company search and profile refresh. Choose the operation and filters in the [API reference](https://mart.dev/docs/). Search and Jobs use stored public data; consult the endpoint notes for field and freshness behavior.
+See the [API reference](https://mart.dev/docs/), [errors and status](https://mart.dev/docs/#errors), and [credits and limits](https://mart.dev/docs/#credits). Support: [support@mart.dev](mailto:support@mart.dev).
 
-Support: [support@mart.dev](mailto:support@mart.dev).
+The examples have local request-contract and fixture checks. They do not contain recorded live results, implement a production CRM integration, or establish a response-time benchmark.
 
-## Local verification
+Run the person-workflow checks without making API requests:
 
-These examples were checked against the current request contract and exercised with mocked success, authentication, HTTP error and timeout responses. This repository does not contain recorded live results or promise a response-time benchmark.
+```sh
+python3 -m unittest discover -s python -p 'test_*.py'
+```
