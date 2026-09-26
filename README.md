@@ -6,7 +6,7 @@ Public LinkedIn data for products, workflows, or AI agents.
 
 Each example takes a public LinkedIn URL. Person and company enrichment return JSON; contact refresh compares saved snapshots; meeting preparation collects a profile and up to three public posts.
 
-Start with [1,000 free credits](https://mart.dev/signup/?utm_source=github&utm_medium=referral&utm_campaign=mart_examples). These examples use Python 3.10 or later and require no third-party packages. Keep your API key on your server:
+Start with [1,000 free credits](https://mart.dev). These examples use Python 3.10 or later and require no third-party packages. Keep your API key on your server:
 
 ```sh
 git clone https://github.com/Mart-API/mart-examples.git
@@ -72,7 +72,7 @@ One run makes at most two requests, with a maximum of four returned records: one
 
 Requests time out after 30 seconds. Failed HTTP responses are reported without printing your key. Rate limits are not retried automatically; respect `Retry-After` when supplied. Empty results and failed requests use no credits.
 
-See the [API reference](https://mart.dev/docs/), [errors and status](https://mart.dev/docs/#errors), and [credits and limits](https://mart.dev/docs/#credits). Support: [support@mart.dev](mailto:support@mart.dev).
+See the [API reference](https://mart.dev/docs/), [errors and status](https://mart.dev/docs/#errors), and [credits and limits](https://mart.dev/docs/#credits).
 
 The examples have local request-contract and fixture checks. They do not contain recorded live results, implement a production CRM integration, or establish a response-time benchmark.
 
